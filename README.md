@@ -13,7 +13,7 @@ To set up a cronjobs run ```crontab -e``` and add the script as shown in the exa
 
 # Example
 
-To use this example, create a new server called "slackbread" with the ```pst-create``` script.
+To use this example, create a new server called "slackbread" with the ```pst_create``` script.
 Notice, that the example uses a separate user called "minecraft" for this jobs.
 Then you can add cronjobs as shown below.
 
@@ -43,17 +43,17 @@ Then you can add cronjobs as shown below.
 # m h  dom mon dow   command
 
 # Start minecraft server at 13h30
-28 13 * * * /home/minecraft/Scripts/pst-run.sh slackbread
+28 13 * * * /home/minecraft/pst/Scripts/pst_run slackbread
 
 # Stop minecraft server at 16h30
-30 15 * * * /home/minecraft/Scripts/pst-stop.sh slackbread
+30 15 * * * /home/minecraft/pst/Scripts/pst_stop slackbread
 
 # Start minecraft server at 19h00
-58 18 * * * /home/minecraft/Scripts/pst-run.sh slackbread
+58 18 * * * /home/minecraft/pst/Scripts/pst_run slackbread
 
 # Stop minecraft server at 24h00
-00 23 * * * /home/minecraft/Scripts/pst-stop.sh slackbread
+00 23 * * * /home/minecraft/pst/Scripts/pst_stop slackbread
 
 # Backup minecraft server at 00:10
-10 00 * * * /home/minecraft/Scripts/pst-backup.sh slackbread
+10 00 * * * /home/minecraft/pst/Scripts/pst_backup slackbread
 ```

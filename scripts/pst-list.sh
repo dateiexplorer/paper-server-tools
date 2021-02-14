@@ -1,4 +1,4 @@
-#! /bin/bash -l
+#! /bin/bash
 # Show all available servers to manage.
 
 if ! [ -d "$PAPER_HOME/server/" ]; then
@@ -14,12 +14,12 @@ fi
 
 echo "List all available servers:"
 for server in $list; do
-    printf "$server "
+    printf "    $server "
     if [ $(ps ax | grep "SCREEN" | grep "$server-stop" | wc -l) -ne 0 ]; then
-        echo STOPPING
+        echo "STOPPING"
     elif [ $(ps ax | grep "SCREEN" | grep "$server-run" | wc -l) -ne 0 ]; then
-	echo UP
+	echo "UP"
     else
-	echo DOWN
+	echo "DOWN"
     fi
 done

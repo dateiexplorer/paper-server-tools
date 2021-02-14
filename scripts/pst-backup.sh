@@ -14,12 +14,15 @@ if ! [ -d "$PAPER_HOME/server/$server" ]; then
 fi
 
 # Get current timestamp as foldername
-timestamp="$(date +"%Y%m%d%H%M")"
+timestamp="$(date + "%Y%m%d%H%M")"
 path="$PAPER_BACKUP/$server"
 
 # Make dirs if they're not created yet.
 mkdir -p "$path"
 
 echo "Create backup from $server with timestamp $timestamp"
-cp -r "$PAPER_HOME/server/$server" "$path/$timestamp"
+
+# Creates a tar archive and compress it with gzip
+tar -czpf "$path/$timestamp.tar.gz" "$PAPER_HOME/server/$server"
+
 echo "Process finished successfully!"

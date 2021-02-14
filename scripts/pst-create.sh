@@ -1,27 +1,20 @@
 #! /bin/bash -l
 # Run this script to create a new paper server instance.
 
+set -e
+
+echo -e "
+                __                 __
+______  _______/  |_  ____   ____ |  |   ______
+\____ \/  ___/\   __\/  _ \ /  _ \|  |  /  ___/
+|  |_> >___ \  |  | (  <_> |  <_> )  |__\___ \\
+|   __/____  > |__|  \____/ \____/|____/____  >
+|__|       \/                               \/
+
+Create new server...
+"
+
 current_pwd="$(pwd)"
-
-# Check requirements for install and execution
-echo "Checking requirements..."
-requirements_present=true
-for requirement in wget java screen; do
-  printf "$requirement "
-  if [ -x "$(command -v $requirement)" ]; then
-    echo OK
-  else
-    echo MISSING
-    "$requirements_present"=false
-  fi
-done | column -t 
-
-if [ "$bool" = false ]; then
-  echo "Please install missing requirements. Aborting..." 
-  exit 
-fi
-
-printf "\n"
 
 # Set server settings
 read -p "Server name: " server_name
@@ -30,7 +23,6 @@ if [ -z $server_name ]; then
   echo "Server name must be set!"
   exit
 fi
-
 
 path="$PAPER_HOME/server/$server_name"
 if [ -d "$path" ]; then
@@ -42,20 +34,20 @@ fi
 mkdir -p "$path"
 cd "$path"
 
-# Do things in $PAPER_HOME/$server_name/
-read -p "Server version (e.g. 1.16.4): " version
-wget -O paper_server.jar "https://papermc.io/api/v1/paper/$version/latest/download"
+echo "Available server versions:"
+versions=$(curl -s "https://papermc.io/api/v1/paper/" | \
+    jq -r '.versions | reverse | @sh')
 
-if [ $? -ne 0 ]; then
-  echo "Download for this version failed. Aborting..."
-  echo "Please check..."
-  echo "  * your internet connection" 
-  echo "  * write permissions for this directory" 
-  echo "  * which version is available to download" 
-  cd ..
-  rm -r "$server_name"
-  exit
-fi
+for v in $versions; do
+    echo "    $(echo "$v" | sed "s/'//g")"
+done
+
+# Do things in $PAPER_HOME/$server_name/
+read -p "Enter server version: " version
+
+# Get sepcific server version
+curl -o paper_server.jar \
+    "https://papermc.io/api/v1/paper/$version/latest/download" &> /dev/null
 
 java -jar -Xms1024M -Xmx1024M paper_server.jar
 

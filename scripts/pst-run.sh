@@ -21,8 +21,10 @@ if [ $(ps ax | grep "java" | grep "$server" | wc -l) != 0 ]; then
 fi
 
 cd "$path"
-screen -dmS "$server-run" java -jar -Xms2600M -Xmx2600M "$path/paper_server.jar"
+screen -dmS "$server-run" java -jar -Xms2600M -Xmx2600M \
+    "$path/paper_server.jar"
 echo "Starting minecraft server. To view window type 'screen -r $server-run'."
-echo "To minimize the window and let the server run in background, press Ctrl+A then Ctrl+D."
+echo "To minimize the window and let the server run in background, \
+press Ctrl+A then Ctrl+D."
 
 cd "$current_pwd"

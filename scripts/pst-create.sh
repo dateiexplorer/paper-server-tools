@@ -39,7 +39,7 @@ versions=$(curl -s "https://papermc.io/api/v1/paper/" | \
     jq -r '.versions | reverse | @sh')
 
 for v in $versions; do
-    echo "    $(echo "$v" | sed "s/'//g")"
+    echo "  $(echo "$v" | sed "s/'//g")"
 done
 
 # Do things in $PAPER_HOME/$server_name/
@@ -49,6 +49,8 @@ read -p "Enter server version: " version
 curl -o paper_server.jar \
     "https://papermc.io/api/v1/paper/$version/latest/download" &> /dev/null
 
+
+echo "Execute server jar for the first time..."
 java -jar -Xms1024M -Xmx1024M paper_server.jar
 
 printf "\n"

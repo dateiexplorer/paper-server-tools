@@ -24,7 +24,7 @@ if [ -z $server_name ]; then
   exit
 fi
 
-path="$PAPER_HOME/server/$server_name"
+path="$PAPER_HOME/$server_name"
 if [ -d "$path" ]; then
   echo "This directory already exists!"
   echo "Please remove the directory or enter another server name!"

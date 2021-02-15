@@ -1,12 +1,12 @@
 #! /bin/bash
 # Show all available servers to manage.
 
-if ! [ -d "$PAPER_HOME/server/" ]; then
+if ! [ -d "$PAPER_HOME/" ]; then
     echo "You hav'nt any server yet."
     exit
 fi
 
-list=$(ls "$PAPER_HOME/server/")
+list=$(ls "$PAPER_HOME/")
 if [ -z "$list" ]; then
     echo "No servers available."
     exit

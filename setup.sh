@@ -37,7 +37,7 @@ if [ -f "$HOME/.bash_profile" &> /dev/null ] && [ $(cat "$HOME/.bash_profile" \
 file."
 else
     echo "Set PAPER_HOME variable in ~/.bash_profile"
-    echo "PAPER_HOME=\"$HOME/Paper\"" >> "$HOME/.bash_profile"
+    echo "PAPER_HOME=\"$HOME/Paper/server\"" >> "$HOME/.bash_profile"
 fi
 
 printf "\n"

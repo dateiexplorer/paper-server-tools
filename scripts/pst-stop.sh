@@ -8,7 +8,7 @@ if [ -z "$server" ]; then
     exit
 fi
 
-path="$PAPER_HOME/server/$server"
+path="$PAPER_HOME/$server"
 if ! [ -d "$path" ]; then
    echo "This server does not exists."
    exit

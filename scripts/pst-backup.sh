@@ -2,6 +2,10 @@
 # Run this script to backup a server.
 # It creates a complete copy of the server instance.
 
+if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
+    echo "Please run the setup.sh script before using this script."
+fi
+
 current_pwd="$(pwd)"
 
 server="$1"

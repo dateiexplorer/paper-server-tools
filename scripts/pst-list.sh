@@ -1,6 +1,10 @@
 #! /bin/bash -l
 # Show all available servers to manage.
 
+if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
+    echo "Please run the setup.sh script before using this script."
+fi
+
 if ! [ -d "$PAPER_HOME/" ]; then
     echo "You hav'nt any server yet."
     exit

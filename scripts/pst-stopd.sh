@@ -2,6 +2,10 @@
 # Do not run this script manually.
 # Use the pst-stop.sh script instead.
 
+if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
+    echo "Please run the setup.sh script before using this script."
+fi
+
 server="$1"
 
 echo "Server $server will shut down in 1 hour."

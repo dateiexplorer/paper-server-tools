@@ -15,6 +15,18 @@ if ! [ -d "$PAPER_HOME/$server" ]; then
     exit
 fi
 
+# If a server is running or a stop job is running, don't backup any files to
+# avoid data corruption.
+if [ $(ps ax | grep "SCREEN" | grep "$server" | wc -l) -ne 0 ]; then
+    echo "This server is currently running."
+    echo "Terminate all coressponding processes before backup data."
+    echo "Corresponding processes (uids):"
+    for p in $(ps -ef | grep "SCREEN" | grep "$server" | grep -v "grep" \
+            | awk '{ print $2 }'); do
+        echo "  $p"
+    done
+fi
+
 # Get current timestamp as foldername
 timestamp="$(date +"%Y%m%d%H%M")"
 path="$PAPER_BACKUP/$server"

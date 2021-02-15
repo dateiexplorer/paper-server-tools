@@ -15,6 +15,18 @@ if ! [ -d "$PAPER_BACKUP/$server" ]; then
     exit
 fi
 
+# If a server is running or a stop job is running, don't restore any files to
+# avoid data corruption.
+if [ $(ps ax | grep "SCREEN" | grep "$server" | wc -l) -ne 0 ]; then
+    echo "This server is currently running."
+    echo "Terminate all coressponding processes before restore data."
+    echo "Corresponding processes (uids):"
+    for p in $(ps -ef | grep "SCREEN" | grep "$server" | grep -v "grep" \
+            | awk '{ print $2 }'); do
+        echo "  $p"
+    done
+fi
+
 # List all available backups
 echo "Available backups:"
 for b in $(ls "$PAPER_BACKUP/$server"); do

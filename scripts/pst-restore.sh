@@ -24,7 +24,7 @@ done
 # Choose a backup
 read -p "Enter a backup version: " version
 
-if ! [ -d "$PAPER_BACKUP/$server/$version" ]; then
+if ! [ -f "$PAPER_BACKUP/$server/$version" ]; then
     echo "Backup not found. Aborting..."
     exit
 fi

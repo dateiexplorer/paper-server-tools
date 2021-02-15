@@ -18,7 +18,7 @@ fi
 # List all available backups
 echo "Available backups:"
 for b in $(ls "$PAPER_BACKUP/$server"); do
-    echo "    $b"
+    echo "  $b"
 done
 
 # Choose a backup
@@ -26,6 +26,7 @@ read -p "Enter a backup version: " version
 
 if ! [ -d "$PAPER_BACKUP/$server/$version" ]; then
     "Backup not found. Aborting..."
+    exit
 fi
 
 # Make dirs if they're not created yet.

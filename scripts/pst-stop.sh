@@ -34,5 +34,5 @@ fi
 
 screen -dmS "$server-stop" sh "$(dirname $(realpath $0))/pst-stopd.sh" "$server"
 echo "Stop script is running. To view window type 'screen -r $server-stop'."
-echo "To minimize the window and let the script run in background, |
+echo "To minimize the window and let the script run in background, \
 press Ctrl+A then Ctrl+D."

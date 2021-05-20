@@ -15,15 +15,15 @@ if [ -z "$server" ]; then
     exit
 fi
 
+# This server directory exists.
+# Get teh real server name if $server is a symlink
+server=$(basename $(realpath "$PAPER_HOME/$server"))
+
 # Check the real path, even if it is a symlink
-if ! [ -d $(realpath "$PAPER_BACKUP/$server") ]; then
+if ! [ -e "$PAPER_BACKUP/$server" ]; then
     echo "No backups existing for this server. Aborting..."
     exit
 fi
-
-# This server directory exists.
-# Get teh real server name if $server is a symlink
-server=$(basename $(realpath "$PAPER_BACKUP/$server"))
 
 # If a server is running or a stop job is running, don't restore any files to
 # avoid data corruption.

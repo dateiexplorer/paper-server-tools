@@ -16,7 +16,7 @@ if [ -z "$server" ]; then
 fi
 
 # Check the real path, even if it is a symlink.
-if ! [ -d $(realpath "$PAPER_HOME/$server") ]; then
+if ! [ -e "$PAPER_HOME/$server" ]; then
     echo "This server does not exists. Aborting..."
     exit
 fi
@@ -35,12 +35,13 @@ if [ $(ps ax | grep "SCREEN" | grep "$server" | wc -l) -ne 0 ]; then
             | awk '{ print $2 }'); do
         echo "  $p"
     done
+    exit
 fi
 
 # Get current timestamp as foldername
 timestamp="$(date +"%Y%m%d%H%M")"
 
-path=$("$PAPER_BACKUP/$server")
+path="$PAPER_BACKUP/$server"
 
 # Make dirs if they're not created yet.
 mkdir -p "$path"

@@ -13,8 +13,9 @@ path="$PAPER_HOME/$server";
 
 current="$PAPER_HOME/current"
 
-if [ -z "server" ]; then
+if [ -z "$server" ]; then
     echo "Please enter name of the server you want to set as current.";
+    exit
 fi
 
 if ! [ -e "$path" ]; then
@@ -31,7 +32,8 @@ if [ -d "$current" ]; then
     read -p "Would you override the current server? [y/N] " continue
 
     # If not continue, exit the script
-    if ! [ $continue ~= "(y|Y)(es)?" ]; then
+    if ! [[ $continue =~ [yY](es)? ]]; then
+        echo "Aborting..."
         exit
     else
         # Stop the current server, if it runs

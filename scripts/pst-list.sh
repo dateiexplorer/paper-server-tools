@@ -17,7 +17,7 @@ dir=$(ls "$PAPER_HOME/" | grep -v "current")
 list=
 for entry in $dir; do
     # Check if the neccessary jar file exists.
-    if [ -f "$PAPER_HOME/$entry/paper_server.jar" ] then
+    if [ -f "$PAPER_HOME/$entry/paper_server.jar" ]; then
         list="${list} $entry"
     fi
 done

@@ -18,6 +18,14 @@ if [ -z "$server" ]; then
     exit
 fi
 
+# Forbid the to symlink the curernt server, because this name is used by the toolchain as
+# symlink.
+if [ $server_name = "current" ]; then
+    echo "You're crazy. Do you like recursiveness?"
+    echo "Can't symlink the 'current' directory because it's a symlink itself."
+    exit
+fi
+
 if ! [ -e "$path" ]; then
     echo "This server does not exists. Aborting..."
     exit

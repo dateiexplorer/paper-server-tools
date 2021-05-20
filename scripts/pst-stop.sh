@@ -1,10 +1,11 @@
-#! /bin/bash -l
+#!/bin/bash -l
 # Minecraft server save and shutdown.
 # Run this script 1 hour before you want shutdown your server.
 
 
 if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
     echo "Please run the setup.sh script before using this script."
+    exit
 fi
 
 server="$1"

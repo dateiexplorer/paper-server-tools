@@ -1,9 +1,10 @@
-#! /bin/bash -l
+#!/bin/bash -l
 # Do not run this script manually.
 # Use the pst-stop.sh script instead.
 
 if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
-    echo "Please run the setup.sh script before using this script."
+    echo "Please run the setup script before using this script."
+    exit
 fi
 
 server="$1"

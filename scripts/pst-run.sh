@@ -1,8 +1,9 @@
-#! /bin/bash -l
+#!/bin/bash -l
 # Run this script to start and run a server.
 
 if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
-    echo "Please run the setup.sh script before using this script."
+    echo "Please run the setup script before using this script."
+    exit
 fi
 
 current_pwd="$(pwd)"

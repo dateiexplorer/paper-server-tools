@@ -1,12 +1,13 @@
-#! /bin/bash -l
+#!/bin/bash -l
 # Show all available servers to manage.
 
 if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
-    echo "Please run the setup.sh script before using this script."
+    echo "Please run the setup script before using this script."
+    exit
 fi
 
 if ! [ -d "$PAPER_HOME/" ]; then
-    echo "You hav'nt any server yet."
+    echo "No servers available."
     exit
 fi
 
@@ -30,8 +31,8 @@ for server in $list; do
     if [ $(ps ax | grep "SCREEN" | grep "$server-stop" | wc -l) -ne 0 ]; then
         echo "STOPPING"
     elif [ $(ps ax | grep "SCREEN" | grep "$server-run" | wc -l) -ne 0 ]; then
-	echo "UP"
+        echo "UP"
     else
-	echo "DOWN"
+        echo "DOWN"
     fi
 done

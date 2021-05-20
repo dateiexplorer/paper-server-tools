@@ -32,7 +32,7 @@ done
 if [ -z $all_requirements_present ]; then
     echo "Some requirements [ ] are missing."
     echo "Please install them and rerun the setup."
-    exit 0
+    exit
 else
     echo "All requirements are installed. Let's go!"
 fi

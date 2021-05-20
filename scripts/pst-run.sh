@@ -1,9 +1,13 @@
 #! /bin/bash -l
 # Run this script to start and run a server.
 
+if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
+    echo "Please run the setup.sh script before using this script."
+fi
+
 current_pwd="$(pwd)"
 server="$1"
-path="$PAPER_HOME/server/$server";
+path="$PAPER_HOME/$server";
 
 if [ -z "$server" ]; then
     echo "Please enter name of the server you want to start.";

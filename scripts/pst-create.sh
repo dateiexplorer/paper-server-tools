@@ -1,6 +1,10 @@
 #! /bin/bash -l
 # Run this script to create a new paper server instance.
 
+if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
+    echo "Please run the setup.sh script before using this script."
+fi
+
 set -e
 
 echo -e "
@@ -24,7 +28,7 @@ if [ -z $server_name ]; then
   exit
 fi
 
-path="$PAPER_HOME/server/$server_name"
+path="$PAPER_HOME/$server_name"
 if [ -d "$path" ]; then
   echo "This directory already exists!"
   echo "Please remove the directory or enter another server name!"
@@ -39,7 +43,7 @@ versions=$(curl -s "https://papermc.io/api/v1/paper/" | \
     jq -r '.versions | reverse | @sh')
 
 for v in $versions; do
-    echo "    $(echo "$v" | sed "s/'//g")"
+    echo "  $(echo "$v" | sed "s/'//g")"
 done
 
 # Do things in $PAPER_HOME/$server_name/
@@ -49,6 +53,8 @@ read -p "Enter server version: " version
 curl -o paper_server.jar \
     "https://papermc.io/api/v1/paper/$version/latest/download" &> /dev/null
 
+
+echo "Execute server jar for the first time..."
 java -jar -Xms1024M -Xmx1024M paper_server.jar
 
 printf "\n"

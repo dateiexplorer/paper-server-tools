@@ -2,13 +2,18 @@
 # Minecraft server save and shutdown.
 # Run this script 1 hour before you want shutdown your server.
 
+
+if [ -z "$PAPER_HOME" ] || [ -z "$PAPER_BACKUP" ]; then
+    echo "Please run the setup.sh script before using this script."
+fi
+
 server="$1"
 if [ -z "$server" ]; then
     echo "Please enter the name of the server you want to stop."
     exit
 fi
 
-path="$PAPER_HOME/server/$server"
+path="$PAPER_HOME/$server"
 if ! [ -d "$path" ]; then
    echo "This server does not exists."
    exit

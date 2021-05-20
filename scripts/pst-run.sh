@@ -15,10 +15,12 @@ if [ -z "$server" ]; then
     exit
 fi
 
-if ! [ -d "$path" ]; then
+if ! [ -e "$path" ]; then
     echo "This server does not exists. Aborting..."
     exit
 fi
+
+server=$(basename $(realpath "$path"))
 
 if [ $(ps ax | grep "java" | grep "$server" | wc -l) != 0 ]; then
    echo "Server $server is already UP. Aborting..."

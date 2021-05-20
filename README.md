@@ -30,7 +30,7 @@ script.
 ## Run
 To run a server, use the following command:
 ```sh
-$ ./pst-run <server_name>
+./pst-run <server_name>
 ```
 
 The server must be created before and must stored in the path defined by the
@@ -39,7 +39,7 @@ The server must be created before and must stored in the path defined by the
 ## Stop
 To stop a server, use the following command:
 ```sh
-$ ./pst-stop <server_name>
+./pst-stop <server_name>
 ```
 
 The script starts a background job, which stops the server after 1 hour.
@@ -53,7 +53,7 @@ Backups are important! So, the toolchain has the ability to create backups from
 your servers. To automate backups, use cronjobs.
 To create a backup, run the following command:
 ```sh
-$ ./pst-backup <server_name>
+./pst-backup <server_name>
 ```
 
 The script will create a ```<timestamp>.tar.gz``` file, which holds all data
@@ -61,7 +61,7 @@ of the selected server.
 
 To restore a backup, use the
 ```sh
-$ ./pst-restore <server_name>
+./pst-restore <server_name>
 ```
 
 command. This script lists all available backups for the selected server. You

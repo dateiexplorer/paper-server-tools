@@ -8,6 +8,7 @@ fi
 
 set -e
 
+# Print banner
 echo -e "
                 __                 __
 ______  _______/  |_  ____   ____ |  |   ______
@@ -25,15 +26,23 @@ current_pwd="$(pwd)"
 read -p "Server name: " server_name
 
 if [ -z $server_name ]; then
-  echo "Server name must be set!"
-  exit
+    echo "Server name must be set!"
+    exit
+fi
+
+# Forbid the `current` server, because this name is used by the toolchain as
+# symlink.
+if [ $server_name = "current" ]; then
+    echo "This name is reserved by the toolchain."
+    echo "Please chose another server name!"
+    exit
 fi
 
 path="$PAPER_HOME/$server_name"
 if [ -d "$path" ]; then
-  echo "This directory already exists!"
-  echo "Please remove the directory or enter another server name!"
-  exit
+    echo "This directory already exists!"
+    echo "Please remove the directory or enter another server name!"
+    exit
 fi
 
 mkdir -p "$path"

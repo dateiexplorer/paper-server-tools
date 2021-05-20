@@ -15,10 +15,15 @@ if [ -z "$server" ]; then
     exit
 fi
 
-if ! [ -d "$PAPER_HOME/$server" ]; then
+# Check the real path, even if it is a symlink.
+if ! [ -d $(realpath "$PAPER_HOME/$server") ]; then
     echo "This server does not exists. Aborting..."
     exit
 fi
+
+# The server directory exists.
+# Get the real server name if $server is a symlink.
+server=$(basename $(realpath "$PAPER_HOME/$server"))
 
 # If a server is running or a stop job is running, don't backup any files to
 # avoid data corruption.
@@ -34,7 +39,8 @@ fi
 
 # Get current timestamp as foldername
 timestamp="$(date +"%Y%m%d%H%M")"
-path="$PAPER_BACKUP/$server"
+
+path=$("$PAPER_BACKUP/$server")
 
 # Make dirs if they're not created yet.
 mkdir -p "$path"

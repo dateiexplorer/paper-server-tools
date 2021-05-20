@@ -28,8 +28,10 @@ if [ $(ps ax | grep "java" | grep "$server" | wc -l) -eq 0 ]; then
 fi
 
 if [ $(ps ax | grep "SCREEN" | grep "$server-stop" | wc -l) -ne 0 ]; then
-   echo "Stop script is already running. Aborting..."
-   exit
+    echo "Stop script is already running."
+    echo "To access the console type 'screen -r $server-stop'."
+    echo "Aborting..."
+    exit
 fi
 
 screen -dmS "$server-stop" sh "$(dirname $(realpath $0))/pst-stopd.sh" "$server"

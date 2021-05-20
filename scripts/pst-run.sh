@@ -23,7 +23,9 @@ fi
 server=$(basename $(realpath "$path"))
 
 if [ $(ps ax | grep "java" | grep "$server" | wc -l) != 0 ]; then
-   echo "Server $server is already UP. Aborting..."
+   echo "Server $server is already UP."
+   echo "To access the server console type 'screen -r $server-run'."
+   echo "Aborting..."
    exit
 fi
 

@@ -133,7 +133,7 @@ create() {
     # TODO: Make sure that the command executes successfully
 
     echo "Execute server jar for the first time..."
-    java -jar -Xms1024M -Xmx1024M paper_server.jar
+    java -Xms256M -Xmx496M -jar paper_server.jar
 
     printf "\n"
     echo "Accepting EULA..."

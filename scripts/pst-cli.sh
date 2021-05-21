@@ -133,7 +133,7 @@ create() {
     # TODO: Make sure that the command executes successfully
 
     echo "Execute server jar for the first time..."
-    java -jar -Xms1024M -Xmx1024M paper_server.jar
+    java -Xms256M -Xmx496M -jar paper_server.jar
 
     printf "\n"
     echo "Accepting EULA..."
@@ -196,7 +196,7 @@ run() {
     fi
 
     cd "$path"
-    screen -dmS "$server-run" java -jar -Xms2600M -Xmx2600M \
+    screen -dmS "$server-run" java -Xms256M -Xmx496M -jar \
         "$path/paper_server.jar"
     echo "Starting minecraft server. To view window type 'screen -r $server-run'."
     echo "To minimize the window and let the server run in background, press Ctrl+A then Ctrl+D."

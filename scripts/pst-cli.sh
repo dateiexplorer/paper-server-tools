@@ -170,6 +170,8 @@ create() {
     echo "Default port is 25565."
 }
 
+#===============================================================================
+
 run() {
     server="$1"
     path="$PAPER_HOME/$server";
@@ -199,6 +201,8 @@ run() {
     echo "Starting minecraft server. To view window type 'screen -r $server-run'."
     echo "To minimize the window and let the server run in background, press Ctrl+A then Ctrl+D."
 }
+
+#===============================================================================
 
 stop() {
     server="$1"
@@ -231,6 +235,8 @@ stop() {
     echo "Stop script is running. To view window type 'screen -r $server-stop'."
     echo "To minimize the window and let the script run in background, press Ctrl+A then Ctrl+D."
 }
+
+#===============================================================================
 
 backup() {
     server="$1"
@@ -278,6 +284,8 @@ backup() {
 
     echo "Backup successfully created!"
 }
+
+#===============================================================================
 
 restore() {
     server="$1"
@@ -334,6 +342,8 @@ restore() {
     echo "Server successfully restored!"
 }
 
+#===============================================================================
+
 list() {
     if ! [ -d "$PAPER_HOME/" ]; then
         echo "No servers available."
@@ -384,6 +394,8 @@ list() {
         printf "\n"
     done
 }
+
+#===============================================================================
 
 current() {
     server="$1"
@@ -437,6 +449,8 @@ current() {
 
     echo "Set $server as current successfully!"
 }
+
+#===============================================================================
 
 usage() {
     # Print banner

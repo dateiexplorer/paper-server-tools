@@ -445,7 +445,7 @@ current() {
 
     # Forbid the to symlink the curernt server, because this name is used by the
     # toolchain as symlink.
-    if [ $server_name = "current" ]; then
+    if [ "$server" = "current" ]; then
         echo "You're crazy. Do you like recursiveness?"
         echo "Can't symlink the 'current' directory because it's a symlink itself."
         exit -1

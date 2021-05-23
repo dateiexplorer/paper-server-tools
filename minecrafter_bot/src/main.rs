@@ -83,8 +83,8 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
                 true => {
                     format!("Yeah, start the server. Will available under:\n```{}:{}```", 
                         server_info.ip, server_info.port)},
-                false => "Currently not possible to start the server!".to_owned() + "
-                    Please inform the server admin to solve this issue."
+                false => "Currently not possible to start the server!".to_owned() + 
+                    "Please inform the server admin to solve this issue."
             };
 
             msg.channel_id.say(&ctx.http, message).await?;

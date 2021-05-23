@@ -90,7 +90,7 @@ Then you can add cronjobs via ```crontab -e``` as shown below.
 # Start minecraft server at 13h30 (every day)
 # Notice, that the server starts 2 minutes before, because it needs some time
 # before you're able to connect.
-28 13 * * * /home/minecraft/paper-server-tools/scripts/pst-cli.sh start mcserver
+28 13 * * * /home/minecraft/paper-server-tools/scripts/pst-cli.sh run mcserver
 
 # Stop minecraft server at 16h30 (every day)
 # Notice that the stop jobs run for 1 hour before it shuts down the server.

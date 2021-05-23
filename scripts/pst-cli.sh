@@ -279,6 +279,7 @@ backup() {
     if ! [ -e "$PAPER_HOME/$server" ]; then
         echo "This server does not exists. Aborting..."
         exit
+    fi
 
     # The server directory exists.
     # Get the real server name if $server is a symlink.

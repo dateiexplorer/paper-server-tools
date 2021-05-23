@@ -36,6 +36,7 @@ Usage:
   list                  List all available servers
   run <server>          Run a server
   stop <server> [now]   Stop a server
+  restart <server>      Restart a server
   backup <server>       Create a backup from the server
   restore <server>      Restore a server from a backup
   current <server>      Set the given server as 'current'

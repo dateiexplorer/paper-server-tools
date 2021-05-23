@@ -133,7 +133,7 @@ create() {
     # TODO: Make sure that the command executes successfully
 
     echo "Execute server jar for the first time..."
-    java -Xms256M -Xmx496M -jar paper_server.jar
+    java -Xms256M -Xmx496M -jar paper_server.jar --nogui
 
     printf "\n"
     echo "Accepting EULA..."
@@ -165,6 +165,9 @@ create() {
     sed -i "s/level-seed=/level-seed=$c_level_seed/g" server.properties
     fi
 
+    # Apply standard settings
+    sed -i "s/max-players=20/max-players=5/g" server.properties
+
     printf "\n"
     echo "Server successfully created."
     echo "Default port is 25565."
@@ -174,13 +177,12 @@ create() {
 
 run() {
     server="$1"
-    path="$PAPER_HOME/$server";
-
     if [ -z "$server" ]; then
         echo "Please enter name of the server you want to start.";
         exit
     fi
 
+    path="$PAPER_HOME/$server";
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
         exit
@@ -196,8 +198,8 @@ run() {
     fi
 
     cd "$path"
-    screen -dmS "$server-run" java -Xms256M -Xmx496M -jar \
-        "$path/paper_server.jar"
+    screen -dmS "$server-run" java -Xms256M -Xmx1024M -jar \
+        "$path/paper_server.jar" --nogui
     echo "Starting minecraft server. To view window type 'screen -r $server-run'."
     echo "To minimize the window and let the server run in background, press Ctrl+A then Ctrl+D."
 }
@@ -238,6 +240,34 @@ stop() {
 
 #===============================================================================
 
+restart() {
+    server="$1"
+    if [ -z "$server" ]; then
+        echo "Please enter the name of the server you want to restart."
+    fi
+
+    path="$PAPER_HOME/$server"
+    if ! [ -e "$path" ]; then
+        echo "This server does not exists. Aborting..."
+        exit
+    fi
+
+    echo "Restart the server..."
+
+    server=$(basename $(realpath "$path"))
+
+    # Try to stop the server regulary (with save)
+    stop "$server" "now"
+
+    # Make sure to stop the hole session
+    screen -XS "$server-run" quit
+
+    # Start a new session
+    run "$server"
+}
+
+#===============================================================================
+
 backup() {
     server="$1"
     if [ -z "$server" ]; then
@@ -249,7 +279,6 @@ backup() {
     if ! [ -e "$PAPER_HOME/$server" ]; then
         echo "This server does not exists. Aborting..."
         exit
-    fi
 
     # The server directory exists.
     # Get the real server name if $server is a symlink.
@@ -472,6 +501,7 @@ Version 1.0.0
     echo "  create                Create a new server"
     echo "  list                  List all available servers"
     echo "  run <server>          Run a server"
+    echo "  restart <server>      Restart a server"
     echo "  stop <server> [now]   Stop a server"
     echo "  backup <server>       Create a backup from the server"
     echo "  restore <server>      Restore a server from a backup"
@@ -502,6 +532,9 @@ case "$command" in
         ;;
     "stop")
         stop "$2" "$3"
+        ;;
+    "restart")
+        restart "$2"
         ;;
     "backup")
         backup "$2"

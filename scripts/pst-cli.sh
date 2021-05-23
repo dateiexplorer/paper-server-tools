@@ -190,7 +190,7 @@ run() {
 
     server=$(basename $(realpath "$path"))
 
-    if [ $(ps ax | grep "java" | grep "$server" | wc -l) != 0 ]; then
+    if [ $(screen -ls | grep "$server-run" | wc -l) -ne 0 ]; then
         echo "Server $server is already UP."
         echo "To access the server console type 'screen -r $server-run'."
         echo "Aborting..."
@@ -221,12 +221,12 @@ stop() {
 
     server=$(basename $(realpath "$path"))
 
-    if [ $(ps ax | grep "java" | grep "$server" | wc -l) -eq 0 ]; then
+    if [ $(screen -ls | grep "$server-run" | wc -l) -eq 0 ]; then
         echo "Server $server is already DOWN! Aborting..."
         return
     fi
 
-    if [ $(ps ax | grep "SCREEN" | grep "$server-stop" | wc -l) -ne 0 ]; then
+    if [ $(screen -ls | grep "$server-stop" | wc -l) -ne 0 ]; then
         echo "Stop script is already running."
         echo "To access the console type 'screen -r $server-stop'."
         echo "Aborting..."
@@ -257,11 +257,15 @@ restart() {
 
     server=$(basename $(realpath "$path"))
 
-    # Try to stop the server regulary (with save)
-    stop "$server" "now"
+    # Make sure to stop all sessions
+    if [ $(screen -ls | grep "$server-run" | wc -l) -ne 0 ]; then
+        screen -XS "$server-run" quit
+    fi
 
-    # Make sure to stop the hole session
-    screen -XS "$server-run" quit
+    if [ $(screen -ls | grep "$server-stop" | wc -l) -ne 0 ]; then
+        echo "A stop script running in the background."
+        # screen -XS "$server-stop" quit
+    fi
 
     # Start a new session
     run "$server"
@@ -288,7 +292,7 @@ backup() {
 
     # If a server is running or a stop job is running, don't backup any files to
     # avoid data corruption.
-    if [ $(ps ax | grep "SCREEN" | grep "$server" | wc -l) -ne 0 ]; then
+    if [ $(screen -ls | grep "$server" | wc -l) -ne 0 ]; then
         echo "This server is currently running."
         echo "Terminate all coressponding processes before backup data."
         echo "Corresponding processes (uids):"
@@ -337,7 +341,7 @@ restore() {
 
     # If a server is running or a stop job is running, don't restore any files to
     # avoid data corruption.
-    if [ $(ps ax | grep "SCREEN" | grep "$server" | wc -l) -ne 0 ]; then
+    if [ $(screen -ls | grep "$server" | wc -l) -ne 0 ]; then
         echo "This server is currently running."
         echo "Terminate all coressponding processes before restore data."
         echo "Corresponding processes (uids):"
@@ -414,9 +418,9 @@ list() {
         fi
 
         printf "$server "
-        if [ $(ps ax | grep "SCREEN" | grep "$server-stop" | wc -l) -ne 0 ]; then
+        if [ $(screen -ls | grep "$server-stop" | wc -l) -ne 0 ]; then
             printf "STOPPING"
-        elif [ $(ps ax | grep "SCREEN" | grep "$server-run" | wc -l) -ne 0 ]; then
+        elif [ $(screen -ls | grep "$server-run" | wc -l) -ne 0 ]; then
             printf "UP"
         else
             printf "DOWN"

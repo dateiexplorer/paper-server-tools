@@ -25,7 +25,7 @@ check_requirements() {
         echo "Some requirements are missing:"
         echo -e "$list"
         echo "Please install them and rerun the script."
-        return
+        exit -1
     fi
 
     # Check if necessary environment variables are set.
@@ -35,7 +35,7 @@ check_requirements() {
         echo "I will setup the variables for you..."
         setup
         echo "Configure the variables as you want, then rerun the script."
-        return
+        exit -1
     fi
 }
 
@@ -94,7 +94,7 @@ create() {
 
     if [ -z $server_name ]; then
         echo "Server name must be set! Aborting..."
-        return
+        exit -1
     fi
 
     # Forbid the `current` server, because this name is used by the toolchain as
@@ -102,14 +102,14 @@ create() {
     if [ $server_name = "current" ]; then
         echo "This name is reserved by the toolchain."
         echo "Please choose another server name!"
-        return
+        exit -1
     fi
 
     path="$PAPER_HOME/$server_name"
     if [ -d "$path" ]; then
         echo "This directory already exists!"
         echo "Please remove the directory or enter another server name!"
-        return
+        exit -1
     fi
 
     mkdir -p "$path"
@@ -145,24 +145,24 @@ create() {
     printf "\n"
     read -p "Server description [A Minecraft Server]: " description
     if [ -n "$description" ]; then
-    sed -i "s/motd=A Minecraft Server/motd=$description/g" server.properties
+        sed -i "s/motd=A Minecraft Server/motd=$description/g" server.properties
     fi
 
     read -p "Gamemode [survival]: " c_gamemode
     if [ -n "$c_gamemode" ]; then
-    sed -i "s/gamemode=survival/gamemode=$c_gamemode/g" server.properties
+        sed -i "s/gamemode=survival/gamemode=$c_gamemode/g" server.properties
     fi
 
     read -p "Difficulty [normal]: " c_difficulty
     if [ -n "$c_gamemode" ]; then
-    sed -i "s/difficulty=easy/difficulty=$c_difficulty/g" server.properties
+        sed -i "s/difficulty=easy/difficulty=$c_difficulty/g" server.properties
     else
-    sed -i "s/difficulty=easy/difficulty=normal/g" server.properties
+        sed -i "s/difficulty=easy/difficulty=normal/g" server.properties
     fi
 
     read -p "Level seed []: " c_level_seed
     if [ -n "$c_level_seed" ]; then
-    sed -i "s/level-seed=/level-seed=$c_level_seed/g" server.properties
+        sed -i "s/level-seed=/level-seed=$c_level_seed/g" server.properties
     fi
 
     # Apply standard settings
@@ -179,13 +179,13 @@ run() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter name of the server you want to start.";
-        return
+        exit -1
     fi
 
     path="$PAPER_HOME/$server";
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        return
+        exit -1
     fi
 
     server=$(basename $(realpath "$path"))
@@ -210,13 +210,13 @@ stop() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to stop."
-        return
+        exit -1
     fi
 
     path="$PAPER_HOME/$server"
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        return
+        exit -1
     fi
 
     server=$(basename $(realpath "$path"))
@@ -244,13 +244,13 @@ restart() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to restart."
-        return
+        exit -1
     fi
 
     path="$PAPER_HOME/$server"
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        return
+        exit -1
     fi
 
     echo "Restart the server..."
@@ -277,13 +277,13 @@ backup() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to backup."
-        return
+        exit -1
     fi
 
     # Check the real path, even if it is a symlink.
     if ! [ -e "$PAPER_HOME/$server" ]; then
         echo "This server does not exists. Aborting..."
-        return
+        exit -1
     fi
 
     # The server directory exists.
@@ -326,7 +326,7 @@ restore() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to restore."
-        return
+        exit -1
     fi
 
     # This server directory exists.
@@ -362,7 +362,7 @@ restore() {
 
     if ! [ -f "$PAPER_BACKUP/$server/$version" ]; then
         echo "Backup not found. Aborting..."
-        return
+        exit -1
     fi
 
     # Make dirs if they're not created yet.
@@ -382,7 +382,7 @@ restore() {
 list() {
     if ! [ -d "$PAPER_HOME/" ]; then
         echo "No servers available."
-        return
+        exit -1
     fi
 
     # Get all directories, except the `current` symlink directory.
@@ -398,7 +398,7 @@ list() {
 
     if [ -z "$list" ]; then
         echo "No servers available."
-        return
+        exit -1
     fi
 
     # Check if `current` is a symlink and the directory behind it exists.
@@ -440,7 +440,7 @@ current() {
 
     if [ -z "$server" ]; then
         echo "Please enter name of the server you want to set as current.";
-        return
+        exit -1
     fi
 
     # Forbid the to symlink the curernt server, because this name is used by the
@@ -448,12 +448,12 @@ current() {
     if [ $server_name = "current" ]; then
         echo "You're crazy. Do you like recursiveness?"
         echo "Can't symlink the 'current' directory because it's a symlink itself."
-        return
+        exit -1
     fi
 
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        return
+        exit -1
     fi
 
     # Selected server exists

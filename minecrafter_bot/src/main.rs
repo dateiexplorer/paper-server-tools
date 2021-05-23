@@ -1,7 +1,6 @@
-use std::env;
+use std::{any::Any, env};
 
 use std::process::Command;
-use std::process::Child;
 
 use craftping::{Response, Result};
 
@@ -44,35 +43,19 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(ping, craft)]
+#[commands(craft)]
 struct General;
 
 async fn get_server_ping_response(server_info: &ServerInfo) -> Result<Response> {
     craftping::tokio::ping(&server_info.ip, server_info.port).await
 }
 
-async fn start_server() -> std::io::Result<Child> {
+async fn start_server() -> std::io::Result<impl Any> {
     // Start subprocess to start the server
     Command::new("../scripts/pst-cli.sh")
         .args( &["run", "current"])
-        .spawn()
-}
-
-#[command]
-async fn ping(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
-    let data_read = ctx.data.read().await;
-    let server_info = data_read.get::<ServerInfo>().expect("Expected server info");
-
-    let result = get_server_ping_response(server_info).await;
-    println!("{:#?}", result);
-
-    let response = match result {
-        Ok(result) => result.description.text,
-        Err(_) => "Server is down :(".to_string()
-    };
-
-    msg.channel_id.say(&ctx.http, response).await?;
-    Ok(())
+        .spawn()?
+        .wait()
 }
 
 #[command]
@@ -90,8 +73,9 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         // Server is DOWN
         Err(_) => {
             let message = match start_server().await {
-                Ok(_) => format!("Yeah, start the server. Will available under:\n```{}:{}```", 
-                            server_info.ip, server_info.port),
+                Ok(_) => {
+                    format!("Yeah, start the server. Will available under:\n```{}:{}```", 
+                        server_info.ip, server_info.port)},
                 Err(_) => "An error occured! Please inform the server admin to solve this issue.".to_string()
             };
 

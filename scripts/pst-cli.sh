@@ -25,7 +25,7 @@ check_requirements() {
         echo "Some requirements are missing:"
         echo -e "$list"
         echo "Please install them and rerun the script."
-        exit
+        return
     fi
 
     # Check if necessary environment variables are set.
@@ -35,7 +35,7 @@ check_requirements() {
         echo "I will setup the variables for you..."
         setup
         echo "Configure the variables as you want, then rerun the script."
-        exit
+        return
     fi
 }
 
@@ -94,7 +94,7 @@ create() {
 
     if [ -z $server_name ]; then
         echo "Server name must be set! Aborting..."
-        exit
+        return
     fi
 
     # Forbid the `current` server, because this name is used by the toolchain as
@@ -102,14 +102,14 @@ create() {
     if [ $server_name = "current" ]; then
         echo "This name is reserved by the toolchain."
         echo "Please choose another server name!"
-        exit
+        return
     fi
 
     path="$PAPER_HOME/$server_name"
     if [ -d "$path" ]; then
         echo "This directory already exists!"
         echo "Please remove the directory or enter another server name!"
-        exit
+        return
     fi
 
     mkdir -p "$path"
@@ -179,13 +179,13 @@ run() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter name of the server you want to start.";
-        exit
+        return
     fi
 
     path="$PAPER_HOME/$server";
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        exit
+        return
     fi
 
     server=$(basename $(realpath "$path"))
@@ -194,7 +194,7 @@ run() {
         echo "Server $server is already UP."
         echo "To access the server console type 'screen -r $server-run'."
         echo "Aborting..."
-        exit
+        return
     fi
 
     cd "$path"
@@ -210,27 +210,27 @@ stop() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to stop."
-        exit
+        return
     fi
 
     path="$PAPER_HOME/$server"
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        exit
+        return
     fi
 
     server=$(basename $(realpath "$path"))
 
     if [ $(ps ax | grep "java" | grep "$server" | wc -l) -eq 0 ]; then
         echo "Server $server is already DOWN! Aborting..."
-        exit
+        return
     fi
 
     if [ $(ps ax | grep "SCREEN" | grep "$server-stop" | wc -l) -ne 0 ]; then
         echo "Stop script is already running."
         echo "To access the console type 'screen -r $server-stop'."
         echo "Aborting..."
-        exit
+        return
     fi
 
     screen -dmS "$server-stop" sh "$(dirname $(realpath $0))/stopd.sh" "$server" "$2"
@@ -244,12 +244,13 @@ restart() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to restart."
+        return
     fi
 
     path="$PAPER_HOME/$server"
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        exit
+        return
     fi
 
     echo "Restart the server..."
@@ -272,13 +273,13 @@ backup() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to backup."
-        exit
+        return
     fi
 
     # Check the real path, even if it is a symlink.
     if ! [ -e "$PAPER_HOME/$server" ]; then
         echo "This server does not exists. Aborting..."
-        exit
+        return
     fi
 
     # The server directory exists.
@@ -295,7 +296,7 @@ backup() {
                 | grep -v "grep" | awk '{ print $2 }'); do
             echo "  $process"
         done
-        exit
+        return
     fi
 
     # Get current timestamp as foldername
@@ -321,7 +322,7 @@ restore() {
     server="$1"
     if [ -z "$server" ]; then
         echo "Please enter the name of the server you want to restore."
-        exit
+        return
     fi
 
     # This server directory exists.
@@ -331,7 +332,7 @@ restore() {
     # Check the real path, even if it is a symlink
     if ! [ -e "$PAPER_BACKUP/$server" ]; then
         echo "No backups existing for this server. Aborting..."
-        exit
+        return
     fi
 
     # If a server is running or a stop job is running, don't restore any files to
@@ -357,7 +358,7 @@ restore() {
 
     if ! [ -f "$PAPER_BACKUP/$server/$version" ]; then
         echo "Backup not found. Aborting..."
-        exit
+        return
     fi
 
     # Make dirs if they're not created yet.
@@ -377,7 +378,7 @@ restore() {
 list() {
     if ! [ -d "$PAPER_HOME/" ]; then
         echo "No servers available."
-        exit
+        return
     fi
 
     # Get all directories, except the `current` symlink directory.
@@ -393,7 +394,7 @@ list() {
 
     if [ -z "$list" ]; then
         echo "No servers available."
-        exit
+        return
     fi
 
     # Check if `current` is a symlink and the directory behind it exists.
@@ -435,7 +436,7 @@ current() {
 
     if [ -z "$server" ]; then
         echo "Please enter name of the server you want to set as current.";
-        exit
+        return
     fi
 
     # Forbid the to symlink the curernt server, because this name is used by the
@@ -443,12 +444,12 @@ current() {
     if [ $server_name = "current" ]; then
         echo "You're crazy. Do you like recursiveness?"
         echo "Can't symlink the 'current' directory because it's a symlink itself."
-        exit
+        return
     fi
 
     if ! [ -e "$path" ]; then
         echo "This server does not exists. Aborting..."
-        exit
+        return
     fi
 
     # Selected server exists
@@ -462,7 +463,7 @@ current() {
         # If not continue, exit the script
         if ! [[ $continue =~ [yY](es)? ]]; then
             echo "Aborting..."
-            exit
+            return
         else
             # TODO: Stop the current server, if it runs
 

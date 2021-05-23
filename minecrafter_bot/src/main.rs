@@ -1,4 +1,4 @@
-use std::{any::Any, env};
+use std::env;
 
 use std::process::Command;
 
@@ -50,12 +50,19 @@ async fn get_server_ping_response(server_info: &ServerInfo) -> Result<Response> 
     craftping::tokio::ping(&server_info.ip, server_info.port).await
 }
 
-async fn start_server() -> std::io::Result<impl Any> {
+async fn start_server() -> bool {
     // Start subprocess to start the server
-    Command::new("../scripts/pst-cli.sh")
-        .args( &["run", "current"])
-        .spawn()?
-        .wait()
+    match Command::new("../scripts/pst-cli.sh").args(&["run", "current"]).spawn() {
+        Ok(mut child) => {
+            match child.wait() {
+                Ok(exit_code) => {
+                    exit_code.success()
+                },
+                Err(_) => false
+            }
+        },
+        Err(_) => false
+    }
 }
 
 #[command]
@@ -73,10 +80,11 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         // Server is DOWN
         Err(_) => {
             let message = match start_server().await {
-                Ok(_) => {
+                true => {
                     format!("Yeah, start the server. Will available under:\n```{}:{}```", 
                         server_info.ip, server_info.port)},
-                Err(_) => "An error occured! Please inform the server admin to solve this issue.".to_string()
+                false => "Currently not possible to start the server!".to_owned() + "
+                    Please inform the server admin to solve this issue."
             };
 
             msg.channel_id.say(&ctx.http, message).await?;

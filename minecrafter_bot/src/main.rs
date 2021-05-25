@@ -87,7 +87,7 @@ fn start_watch_timer(server_info: &ServerInfo) {
                 }
             };
 
-            if stop_counter > PINGS_UNTIL_STOP {
+            if stop_counter >= PINGS_UNTIL_STOP {
                 // Stop the server
                 println!("Stop current server");
                 do_server_action(&["stop", "current", "now"]);
@@ -118,6 +118,9 @@ fn do_server_action(action: &[&str]) -> bool {
 async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let data_read = ctx.data.read().await;
     let server_info = data_read.get::<ServerInfo>().expect("Expected server info");
+
+    // Delete the message from the server
+    msg.delete(&ctx.http).await?;
 
     match get_server_ping_response(server_info).await {
         // Server is already UP
@@ -160,6 +163,8 @@ async fn main() {
         .parse::<u16>()
         .unwrap();
     
+    let server_info = ServerInfo::new(server_ip, server_port);
+
     // Create framework
     let framework = StandardFramework::new()
         .configure(|c| c.prefix("!"))
@@ -170,8 +175,6 @@ async fn main() {
         .event_handler(Handler)
         .await
         .expect("Error creating client");
-
-    let server_info = ServerInfo::new(server_ip, server_port);
     
     // Start a watch timer so that the discord bot already track server status
     start_watch_timer(&server_info);

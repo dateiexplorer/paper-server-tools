@@ -72,12 +72,15 @@ fn start_watch_timer(server_info: &ServerInfo) {
             match get_server_ping_response(&server_info).await {
                 // Server is UP
                 Ok(response) => {
-                    if response.online_players == 0 {
+                    if response.online_players > 0 {
+                        // If players on the server, reset the counter.
+                        stop_counter = 0;
+                    } else {
                         stop_counter += 1;
                         println!("No players on the server ({}/{})", stop_counter, PINGS_UNTIL_STOP);
                     }
                 },
-                // Server is DOWN
+                // Server is DOWN or UNAVAILABLE
                 Err(error) => {
                     stop_counter += 1;
                     eprintln!("An error occured: {}", error);
@@ -168,9 +171,14 @@ async fn main() {
         .await
         .expect("Error creating client");
 
+    let server_info = ServerInfo::new(server_ip, server_port);
+    
+    // Start a watch timer so that the discord bot already track server status
+    start_watch_timer(&server_info);
+
     {
         let mut data = client.data.write().await;
-        data.insert::<ServerInfo>(ServerInfo::new(server_ip, server_port));
+        data.insert::<ServerInfo>(server_info);
     }
 
     // Start client

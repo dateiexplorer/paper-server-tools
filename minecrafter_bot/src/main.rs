@@ -15,6 +15,11 @@ use serenity::framework::{
 };
 use serenity::model::prelude::*;
 
+use tokio::time;
+
+const PINGS_UNTIL_STOP: u8 = 3;
+
+#[derive(Clone)]
 struct ServerInfo {
     ip: String,
     port: u16
@@ -50,9 +55,50 @@ async fn get_server_ping_response(server_info: &ServerInfo) -> Result<Response> 
     craftping::tokio::ping(&server_info.ip, server_info.port).await
 }
 
-async fn start_server() -> bool {
+fn start_watch_timer(server_info: &ServerInfo) {
+    let interval = env::var("WATCH_TIMER_INTERVAL")
+        .expect("Expected a watch timer interval in environment")
+        .parse::<u64>().unwrap();
+
+    let mut interval = time::interval(time::Duration::from_secs(interval));
+    let mut stop_counter = 0;
+
+    let server_info = server_info.clone();
+
+    tokio::spawn(async move {
+        loop {
+            interval.tick().await;
+
+            match get_server_ping_response(&server_info).await {
+                // Server is UP
+                Ok(response) => {
+                    if response.online_players == 0 {
+                        stop_counter += 1;
+                        println!("No players on the server ({}/{})", stop_counter, PINGS_UNTIL_STOP);
+                    }
+                },
+                // Server is DOWN
+                Err(error) => {
+                    stop_counter += 1;
+                    eprintln!("An error occured: {}", error);
+                }
+            };
+
+            if stop_counter > PINGS_UNTIL_STOP {
+                // Stop the server
+                println!("Stop current server");
+                do_server_action(&["stop", "current", "now"]);
+
+                // Stop this timer
+                break;
+            }
+        }
+    });
+}
+
+fn do_server_action(action: &[&str]) -> bool {
     // Start subprocess to start the server
-    match Command::new("../scripts/pst-cli.sh").args(&["run", "current"]).spawn() {
+    match Command::new("../scripts/pst-cli.sh").args(action).spawn() {
         Ok(mut child) => {
             match child.wait() {
                 Ok(exit_code) => {
@@ -79,12 +125,13 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         },
         // Server is DOWN
         Err(_) => {
-            let message = match start_server().await {
+            let message = match do_server_action(&["run", "current"]) {
                 true => {
+                    // Start the watch timer
+                    start_watch_timer(&server_info);
                     format!("Yeah, start the server. Will available under:\n```{}:{}```", 
                         server_info.ip, server_info.port)},
-                false => "Currently not possible to start the server!".to_owned() + 
-                    "Please inform the server admin to solve this issue."
+                false => "Currently it's not possible to start the server!".to_string()
             };
 
             msg.channel_id.say(&ctx.http, message).await?;

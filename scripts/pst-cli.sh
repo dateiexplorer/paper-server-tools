@@ -194,7 +194,7 @@ run() {
         echo "Server $server is already UP."
         echo "To access the server console type 'screen -r $server-run'."
         echo "Aborting..."
-        return
+        exit -1
     fi
 
     cd "$path"

@@ -120,7 +120,7 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let server_info = data_read.get::<ServerInfo>().expect("Expected server info");
 
     // Delete the message from the server
-    msg.delete(&ctx.http).await?;
+    msg.channel_id.delete_message(&ctx.http, msg.id).await?;
 
     match get_server_ping_response(server_info).await {
         // Server is already UP

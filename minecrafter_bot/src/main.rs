@@ -65,6 +65,7 @@ fn start_watch_timer(server_info: &ServerInfo) {
 
     let server_info = server_info.clone();
 
+    println!("Start watch timer with interval: {} sec", interval.period().as_secs());
     tokio::spawn(async move {
         loop {
             interval.tick().await;
@@ -75,6 +76,7 @@ fn start_watch_timer(server_info: &ServerInfo) {
                     if response.online_players > 0 {
                         // If players on the server, reset the counter.
                         stop_counter = 0;
+                        println!("Reset stop counter");
                     } else {
                         stop_counter += 1;
                         println!("No players on the server ({}/{})", stop_counter, PINGS_UNTIL_STOP);
@@ -83,7 +85,7 @@ fn start_watch_timer(server_info: &ServerInfo) {
                 // Server is DOWN or UNAVAILABLE
                 Err(error) => {
                     stop_counter += 1;
-                    eprintln!("An error occured: {}", error);
+                    println!("An error occured: {} ({}/{})", error, stop_counter, PINGS_UNTIL_STOP);
                 }
             };
 
@@ -119,12 +121,14 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let data_read = ctx.data.read().await;
     let server_info = data_read.get::<ServerInfo>().expect("Expected server info");
 
+    msg.channel_id.delete_message(&ctx.http, msg.id).await.unwrap();
+
     match get_server_ping_response(server_info).await {
         // Server is already UP
         Ok(response) => {
             msg.channel_id.say(&ctx.http,
-                format!("Hey **{}**, server is already up!\nCurrently **{}/{}** players are online.",
-                    msg.author.name, response.online_players, response.max_players)).await?;
+                format!("Hey **{}**, server is already up! Reachable under:\n```{}:{}```\nCurrently **{}/{}** players are online.",
+                    server_info.ip, server_info.port, msg.author.name, response.online_players, response.max_players)).await?;
         },
         // Server is DOWN
         Err(_) => {

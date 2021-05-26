@@ -128,7 +128,7 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         Ok(response) => {
             msg.channel_id.say(&ctx.http,
                 format!("Hey **{}**, server is already up! Reachable under:\n```{}:{}```\nCurrently **{}/{}** players are online.",
-                    server_info.ip, server_info.port, msg.author.name, response.online_players, response.max_players)).await?;
+                    msg.author.name, server_info.ip, server_info.port, response.online_players, response.max_players)).await?;
         },
         // Server is DOWN
         Err(_) => {

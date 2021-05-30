@@ -1,9 +1,11 @@
+// Standardlibrary
 use std::env;
+use std::process::{Command, ExitStatus};
 
-use std::process::Command;
-
+// Craftping
 use craftping::{Response, Result};
 
+// Serenity
 use serenity::prelude::*;
 use serenity::async_trait;
 use serenity::framework::{
@@ -15,7 +17,15 @@ use serenity::framework::{
 };
 use serenity::model::prelude::*;
 
+// Tokio
 use tokio::time;
+
+// Chrono
+use chrono::prelude::*;
+
+fn log(msg: &str) {
+    println!("[{}] {}", Utc::now().format("%Y-%m-%d %H:%M:%S"), msg);
+}
 
 const PINGS_UNTIL_STOP: u8 = 3;
 
@@ -43,7 +53,7 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
+        log(format!("{} is connected", ready.user.name).as_str());
     }
 }
 
@@ -65,7 +75,7 @@ fn start_watch_timer(server_info: &ServerInfo) {
 
     let server_info = server_info.clone();
 
-    println!("Start watch timer with interval: {} sec", interval.period().as_secs());
+    log(format!("Start watch timer with interval: {} sec", interval.period().as_secs()).as_str());
     tokio::spawn(async move {
         loop {
             interval.tick().await;
@@ -76,22 +86,22 @@ fn start_watch_timer(server_info: &ServerInfo) {
                     if response.online_players > 0 {
                         // If players on the server, reset the counter.
                         stop_counter = 0;
-                        println!("Reset stop counter");
+                        log("Players are on the server, reset stop counter");
                     } else {
                         stop_counter += 1;
-                        println!("No players on the server ({}/{})", stop_counter, PINGS_UNTIL_STOP);
+                        log(format!("No players on the server ({}/{})", stop_counter, PINGS_UNTIL_STOP).as_str());
                     }
                 },
                 // Server is DOWN or UNAVAILABLE
                 Err(error) => {
                     stop_counter += 1;
-                    println!("An error occured: {} ({}/{})", error, stop_counter, PINGS_UNTIL_STOP);
+                    log(format!("An error occured: {} ({}/{})", error, stop_counter, PINGS_UNTIL_STOP).as_str());
                 }
             };
 
             if stop_counter >= PINGS_UNTIL_STOP {
                 // Stop the server
-                println!("Stop current server");
+                log("Stop server");
                 do_server_action(&["stop", "current", "now"]);
 
                 // Stop this timer
@@ -101,19 +111,12 @@ fn start_watch_timer(server_info: &ServerInfo) {
     });
 }
 
-fn do_server_action(action: &[&str]) -> bool {
-    // Start subprocess to start the server
-    match Command::new("../scripts/pst-cli.sh").args(action).spawn() {
-        Ok(mut child) => {
-            match child.wait() {
-                Ok(exit_code) => {
-                    exit_code.success()
-                },
-                Err(_) => false
-            }
-        },
-        Err(_) => false
+fn do_server_action(action: &[&str]) -> Option<ExitStatus> {
+    if let Some(mut child) = Command::new("../scripts/pst-cli.sh").args(action).spawn().ok() {
+        return child.wait().ok()
     }
+
+    None
 }
 
 #[command]
@@ -121,24 +124,33 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let data_read = ctx.data.read().await;
     let server_info = data_read.get::<ServerInfo>().expect("Expected server info");
 
-    msg.channel_id.delete_message(&ctx.http, msg.id).await.unwrap();
+    // Uncomment to delete the message
+    // msg.channel_id.delete_message(&ctx.http, msg.id).await.unwrap();
+    
+    log(format!("{} asks to start the server", msg.author.name).as_str());
 
     match get_server_ping_response(server_info).await {
         // Server is already UP
         Ok(response) => {
+            log("Server is already running");
             msg.channel_id.say(&ctx.http,
-                format!("Hey **{}**, server is already up! Reachable under:\n```{}:{}```\nCurrently **{}/{}** players are online.",
-                    msg.author.name, server_info.ip, server_info.port, response.online_players, response.max_players)).await?;
+                format!("Hey, server is already up! Reachable under:\n```{}:{}```\nCurrently **{}/{}** players are online.",
+                    server_info.ip, server_info.port, response.online_players, response.max_players)).await?;
         },
         // Server is DOWN
         Err(_) => {
             let message = match do_server_action(&["run", "current"]) {
-                true => {
+                Some(_) => {
+                    log("Start server");
+
                     // Start the watch timer
                     start_watch_timer(&server_info);
                     format!("Yeah, start the server. Will available under:\n```{}:{}```", 
                         server_info.ip, server_info.port)},
-                false => "Currently it's not possible to start the server!".to_string()
+                None => {
+                    log("Not possible to start the server");
+                    "Currently it's not possible to start the server!".to_string()
+                }
             };
 
             msg.channel_id.say(&ctx.http, message).await?;

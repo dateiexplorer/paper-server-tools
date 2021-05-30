@@ -11,3 +11,4 @@ serenity = "0.10"
 tokio = { version = "1.6", features = ["macros", "rt-multi-thread"] }
 dotenv = "0.15"
 craftping = { version = "0.2", features = ["async-tokio"] }
+chrono = "0.4"

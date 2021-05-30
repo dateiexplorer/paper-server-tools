@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# Get newest repository
+# Get newest version of the repository
 git pull
 
-# Start bot
+# Build bot
 cargo build --release
-exec ./target/release/minecrafter_bot &> bot.log
+
+# Run bot in background
+exec ./target/release/minecrafter_bot &> bot.log &

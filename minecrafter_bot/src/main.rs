@@ -24,7 +24,7 @@ use tokio::time;
 use chrono::prelude::*;
 
 fn log(msg: &str) {
-    println!("[{}] {}", Utc::now().format("%Y-%m-%d %H:%M:%S"), msg);
+    println!("[{}] {}", Local::now().format("%Y-%m-%d %H:%M:%S"), msg);
 }
 
 const PINGS_UNTIL_STOP: u8 = 3;

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Stop all other running instances
+for process in $(ps -ef | grep "minecrafter_bot" | \
+    grep -v "grep" | awk '{ print $2 }'); do
+    
+    kill "$process"
+done
+
 # Get newest version of the repository
 git pull
 

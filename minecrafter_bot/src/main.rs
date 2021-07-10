@@ -186,7 +186,8 @@ async fn info(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         },
         // Server is DOWN
         Err(_) => {
-            msg.channel_id.say(&ctx.http, "Server is down! Use the ```!craft``` command to start the server.").await?;
+            msg.channel_id.say(&ctx.http, 
+                "Server is down! Use the following command to start the server:\n```!craft```").await?;
         }
     }
 

@@ -58,7 +58,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(craft)]
+#[commands(craft, info)]
 struct General;
 
 async fn get_server_ping_response(server_info: &ServerInfo) -> Result<Response> {
@@ -103,7 +103,7 @@ fn start_watch_timer(server_info: &ServerInfo) {
                 // Stop the server
                 log("Stop server");
                 do_server_action(&["stop", "current", "now"]);
-
+                do_server_action(&["backup", "current"]);
                 // Stop this timer
                 break;
             }
@@ -154,6 +154,32 @@ async fn craft(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
             };
 
             msg.channel_id.say(&ctx.http, message).await?;
+        }
+    }
+
+    Ok(())
+}
+
+#[command]
+async fn info(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
+    let data_read = ctx.data.read().await;
+    let server_info = data_read.get::<ServerInfo>().expect("Expected server info");
+
+    // Uncomment to delete the message
+    // msg.channel_id.delete_message(&ctx.http, msg.id).await.unwrap();
+    
+    log(format!("{} asks for info about the server", msg.author.name).as_str());
+
+    match get_server_ping_response(server_info).await {
+        // Server is UP
+        Ok(response) => {
+            msg.channel_id.say(&ctx.http,
+                format!("Server is up! Reachable under:\n```{}:{}```\nCurrently **{}/{}** players are online.",
+                    server_info.ip, server_info.port, response.online_players, response.max_players)).await?;
+        },
+        // Server is DOWN
+        Err(_) => {
+            msg.channel_id.say(&ctx.http, "Server is down! Use the ```!craft``` command to start the server.").await?;
         }
     }
 

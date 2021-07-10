@@ -30,4 +30,4 @@ done
 
 # Run bot in background
 echo "Running bot..."
-exec ./target/release/minecrafter_bot &> bot.log &
+exec ./target/release/minecrafter_bot &>> bot.log &

@@ -103,7 +103,14 @@ fn start_watch_timer(server_info: &ServerInfo) {
                 // Stop the server
                 log("Stop server");
                 do_server_action(&["stop", "current", "now"]);
+
+                // Give some time to stop
+                time::sleep(time::Duration::from_secs(5)).await;
+
+                // Backup server
+                log("Backup server");
                 do_server_action(&["backup", "current"]);
+
                 // Stop this timer
                 break;
             }
